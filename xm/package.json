@@ -9,6 +9,7 @@
     "dev": "concurrently \"npm run client:dev\" \"npm run server:dev\"",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
+    "start": "node server.js",
     "check": "vue-tsc -b",
     "lint": "eslint . --ext .ts,.vue",
     "lint:fix": "eslint . --ext .ts,.vue --fix"
@@ -57,6 +58,8 @@
     "unplugin-vue-dev-locator": "^1.0.0",
     "vite": "^5.0.12",
     "vite-plugin-trae-solo-badge": "^1.0.0",
+    "vue-eslint-parser": "^10.2.0",
     "vue-tsc": "^1.8.27"
-  }
+  },
+  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
 }

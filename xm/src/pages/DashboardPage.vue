@@ -7,130 +7,157 @@
           <h1 class="text-4xl font-bold text-white mb-2">企业网络监控数据大屏</h1>
           <p class="text-blue-200">实时监控企业网络状态和员工上网行为</p>
         </div>
-        <t-button theme="primary" variant="base" @click="goKanban" class="shadow-md">
-          看板显示
-        </t-button>
+        <t-space size="small">
+          <t-button theme="primary" variant="outline" @click="goLayout" class="shadow-md">
+            布局模板
+          </t-button>
+          <t-button theme="primary" variant="base" @click="goKanban" class="shadow-md">
+            看板显示
+          </t-button>
+        </t-space>
       </div>
     </div>
 
-    <!-- 实时数据卡片 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-blue-200 text-sm">总流量</p>
-            <p class="text-3xl font-bold text-white">{{ realtimeData.totalTraffic }} MB</p>
+    <div class="grid grid-cols-12 gap-6">
+      <div v-show="!isWidgetHidden('realtime_cards')" :style="widgetStyle('realtime_cards')">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-blue-200 text-sm">总流量</p>
+                <p class="text-3xl font-bold text-white">{{ realtimeData.totalTraffic }} MB</p>
+              </div>
+              <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <TrendingUpIcon class="w-6 h-6 text-blue-400" />
+              </div>
+            </div>
+            <div class="mt-4">
+              <span class="text-green-400 text-sm">↗ +12.5%</span>
+              <span class="text-blue-200 text-sm ml-2">较昨日</span>
+            </div>
           </div>
-          <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-            <TrendingUpIcon class="w-6 h-6 text-blue-400" />
+
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-blue-200 text-sm">在线用户</p>
+                <p class="text-3xl font-bold text-white">{{ realtimeData.onlineUsers }}</p>
+              </div>
+              <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <UsersIcon class="w-6 h-6 text-green-400" />
+              </div>
+            </div>
+            <div class="mt-4">
+              <span class="text-green-400 text-sm">↗ +3</span>
+              <span class="text-blue-200 text-sm ml-2">较1小时前</span>
+            </div>
           </div>
-        </div>
-        <div class="mt-4">
-          <span class="text-green-400 text-sm">↗ +12.5%</span>
-          <span class="text-blue-200 text-sm ml-2">较昨日</span>
+
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-blue-200 text-sm">安全告警</p>
+                <p class="text-3xl font-bold text-white">{{ realtimeData.alertCount }}</p>
+              </div>
+              <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+                <AlertTriangleIcon class="w-6 h-6 text-red-400" />
+              </div>
+            </div>
+            <div class="mt-4">
+              <span class="text-red-400 text-sm">↗ +2</span>
+              <span class="text-blue-200 text-sm ml-2">需要处理</span>
+            </div>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-blue-200 text-sm">网络状态</p>
+                <p class="text-2xl font-bold text-white">{{ realtimeData.networkStatus === 'normal' ? '正常' : '异常' }}</p>
+              </div>
+              <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <WifiIcon class="w-6 h-6 text-green-400" />
+              </div>
+            </div>
+            <div class="mt-4">
+              <span class="text-green-400 text-sm">99.9%</span>
+              <span class="text-blue-200 text-sm ml-2">可用性</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-blue-200 text-sm">在线用户</p>
-            <p class="text-3xl font-bold text-white">{{ realtimeData.onlineUsers }}</p>
-          </div>
-          <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
-            <UsersIcon class="w-6 h-6 text-green-400" />
-          </div>
-        </div>
-        <div class="mt-4">
-          <span class="text-green-400 text-sm">↗ +3</span>
-          <span class="text-blue-200 text-sm ml-2">较1小时前</span>
-        </div>
-      </div>
-
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-blue-200 text-sm">安全告警</p>
-            <p class="text-3xl font-bold text-white">{{ realtimeData.alertCount }}</p>
-          </div>
-          <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
-            <AlertTriangleIcon class="w-6 h-6 text-red-400" />
-          </div>
-        </div>
-        <div class="mt-4">
-          <span class="text-red-400 text-sm">↗ +2</span>
-          <span class="text-blue-200 text-sm ml-2">需要处理</span>
-        </div>
-      </div>
-
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-blue-200 text-sm">网络状态</p>
-            <p class="text-2xl font-bold text-white">{{ realtimeData.networkStatus === 'normal' ? '正常' : '异常' }}</p>
-          </div>
-          <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
-            <WifiIcon class="w-6 h-6 text-green-400" />
-          </div>
-        </div>
-        <div class="mt-4">
-          <span class="text-green-400 text-sm">99.9%</span>
-          <span class="text-blue-200 text-sm ml-2">可用性</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 图表区域 -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <!-- 流量趋势图 -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+      <div v-show="!isWidgetHidden('traffic_trend')" :style="widgetStyle('traffic_trend')" class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
         <h3 class="text-xl font-semibold text-white mb-4">24小时流量趋势</h3>
         <div ref="trafficChartRef" class="h-80"></div>
       </div>
 
-      <!-- 网站访问排行 -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+      <div v-show="!isWidgetHidden('website_hot')" :style="widgetStyle('website_hot')" class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
         <h3 class="text-xl font-semibold text-white mb-4">热门网站访问</h3>
         <div ref="websiteChartRef" class="h-80"></div>
       </div>
-    </div>
 
-    <!-- AI智能分析区域 -->
-    <div class="mb-8">
-      <div class="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-lg p-6 border border-purple-300/30">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center">
-            <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center mr-4">
-              <BrainIcon class="w-6 h-6 text-white" />
+      <div v-show="!isWidgetHidden('ai_insights')" :style="widgetStyle('ai_insights')">
+        <div class="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-lg p-6 border border-purple-300/30">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center mr-4">
+                <BrainIcon class="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 class="text-2xl font-semibold text-white">AI智能分析</h3>
+                <p class="text-purple-200">基于机器学习的网络数据分析与优化建议</p>
+              </div>
             </div>
-            <div>
-              <h3 class="text-2xl font-semibold text-white">AI智能分析</h3>
-              <p class="text-purple-200">基于机器学习的网络数据分析与优化建议</p>
-            </div>
+            <t-button theme="primary" variant="outline" @click="refreshAIAnalysis" :loading="aiAnalysisLoading">
+              <RefreshCwIcon class="w-4 h-4 mr-2" />
+              刷新分析
+            </t-button>
           </div>
-          <t-button theme="primary" variant="outline" @click="refreshAIAnalysis" :loading="aiAnalysisLoading">
-            <RefreshCwIcon class="w-4 h-4 mr-2" />
-            刷新分析
-          </t-button>
-        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- AI分析结果 -->
-          <div class="bg-white/5 rounded-lg p-6">
-            <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
-              <TrendingUpIcon class="w-5 h-5 mr-2 text-green-400" />
-              数据趋势分析
-            </h4>
-            <div class="space-y-4">
-              <div v-for="insight in aiInsights.trends" :key="insight.id" class="bg-white/5 rounded-lg p-4">
-                <div class="flex items-start">
-                  <div class="w-2 h-2 rounded-full mt-2 mr-3" :class="getInsightColor(insight.type)"></div>
-                  <div class="flex-1">
-                    <h5 class="text-white font-medium mb-1">{{ insight.title }}</h5>
-                    <p class="text-gray-300 text-sm mb-2">{{ insight.description }}</p>
-                    <div class="flex items-center text-xs">
-                      <span class="text-gray-400">置信度: </span>
-                      <span class="text-blue-300 ml-1">{{ insight.confidence }}%</span>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white/5 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+                <TrendingUpIcon class="w-5 h-5 mr-2 text-green-400" />
+                数据趋势分析
+              </h4>
+              <div class="space-y-4">
+                <div v-for="insight in aiInsights.trends" :key="insight.id" class="bg-white/5 rounded-lg p-4">
+                  <div class="flex items-start">
+                    <div class="w-2 h-2 rounded-full mt-2 mr-3" :class="getInsightColor(insight.type)"></div>
+                    <div class="flex-1">
+                      <h5 class="text-white font-medium mb-1">{{ insight.title }}</h5>
+                      <p class="text-gray-300 text-sm mb-2">{{ insight.description }}</p>
+                      <div class="flex items-center text-xs">
+                        <span class="text-gray-400">置信度: </span>
+                        <span class="text-blue-300 ml-1">{{ insight.confidence }}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white/5 rounded-lg p-6">
+              <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+                <LightbulbIcon class="w-5 h-5 mr-2 text-yellow-400" />
+                优化建议
+              </h4>
+              <div class="space-y-4">
+                <div v-for="suggestion in aiInsights.suggestions" :key="suggestion.id" class="bg-white/5 rounded-lg p-4">
+                  <div class="flex items-start">
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center mr-3" :class="getPriorityBg(suggestion.priority)">
+                      <span class="text-xs font-bold text-white">{{ suggestion.priority === 'high' ? 'H' : suggestion.priority === 'medium' ? 'M' : 'L' }}</span>
+                    </div>
+                    <div class="flex-1">
+                      <h5 class="text-white font-medium mb-1">{{ suggestion.title }}</h5>
+                      <p class="text-gray-300 text-sm mb-2">{{ suggestion.description }}</p>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400">预期收益: {{ suggestion.impact }}</span>
+                        <t-button size="small" theme="primary" variant="text" @click="applySuggestion(suggestion)">
+                          应用建议
+                        </t-button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -138,53 +165,21 @@
             </div>
           </div>
 
-          <!-- AI优化建议 -->
-          <div class="bg-white/5 rounded-lg p-6">
-            <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
-              <LightbulbIcon class="w-5 h-5 mr-2 text-yellow-400" />
-              优化建议
-            </h4>
-            <div class="space-y-4">
-              <div v-for="suggestion in aiInsights.suggestions" :key="suggestion.id" class="bg-white/5 rounded-lg p-4">
-                <div class="flex items-start">
-                  <div class="w-6 h-6 rounded-full flex items-center justify-center mr-3" :class="getPriorityBg(suggestion.priority)">
-                    <span class="text-xs font-bold text-white">{{ suggestion.priority === 'high' ? 'H' : suggestion.priority === 'medium' ? 'M' : 'L' }}</span>
-                  </div>
-                  <div class="flex-1">
-                    <h5 class="text-white font-medium mb-1">{{ suggestion.title }}</h5>
-                    <p class="text-gray-300 text-sm mb-2">{{ suggestion.description }}</p>
-                    <div class="flex items-center justify-between">
-                      <span class="text-xs text-gray-400">预期收益: {{ suggestion.impact }}</span>
-                      <t-button size="small" theme="primary" variant="text" @click="applySuggestion(suggestion)">
-                        应用建议
-                      </t-button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div class="mt-6 flex items-center justify-between bg-white/5 rounded-lg p-4">
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></div>
+              <span class="text-white text-sm">AI分析引擎运行中</span>
             </div>
-          </div>
-        </div>
-
-        <!-- AI分析状态 -->
-        <div class="mt-6 flex items-center justify-between bg-white/5 rounded-lg p-4">
-          <div class="flex items-center">
-            <div class="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></div>
-            <span class="text-white text-sm">AI分析引擎运行中</span>
-          </div>
-          <div class="flex items-center space-x-4 text-sm text-gray-300">
-            <span>上次更新: {{ formatTime(aiInsights.lastUpdate) }}</span>
-            <span>分析数据量: {{ aiInsights.dataPoints }}K</span>
-            <span>模型准确率: {{ aiInsights.accuracy }}%</span>
+            <div class="flex items-center space-x-4 text-sm text-gray-300">
+              <span>上次更新: {{ formatTime(aiInsights.lastUpdate) }}</span>
+              <span>分析数据量: {{ aiInsights.dataPoints }}K</span>
+              <span>模型准确率: {{ aiInsights.accuracy }}%</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 系统状态和员工概览 -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- 系统资源使用 -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+      <div v-show="!isWidgetHidden('system_resource')" :style="widgetStyle('system_resource')" class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
         <div class="flex items-center mb-4">
           <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center mr-3">
             <ServerIcon class="w-5 h-5 text-purple-400" />
@@ -231,8 +226,7 @@
         </div>
       </div>
 
-      <!-- 部门统计 -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+      <div v-show="!isWidgetHidden('department_stats')" :style="widgetStyle('department_stats')" class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
         <div class="flex items-center mb-4">
           <div class="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center mr-3">
             <BuildingIcon class="w-5 h-5 text-indigo-400" />
@@ -240,8 +234,7 @@
           <h3 class="text-xl font-semibold text-white">部门统计</h3>
         </div>
         <div class="space-y-3">
-          <div v-for="(dept, name) in departmentStats" :key="name" 
-               class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+          <div v-for="(dept, name) in departmentStats" :key="name" class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
             <div class="flex items-center">
               <div class="w-6 h-6 bg-blue-500/20 rounded flex items-center justify-center mr-3">
                 <UsersIcon class="w-4 h-4 text-blue-400" />
@@ -261,8 +254,7 @@
         </div>
       </div>
 
-      <!-- 最新告警 -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+      <div v-show="!isWidgetHidden('recent_alerts')" :style="widgetStyle('recent_alerts')" class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
         <div class="flex items-center mb-4">
           <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center mr-3">
             <ShieldAlertIcon class="w-5 h-5 text-red-400" />
@@ -270,12 +262,15 @@
           <h3 class="text-xl font-semibold text-white">最新告警</h3>
         </div>
         <div class="space-y-3">
-          <div v-for="alert in recentAlerts" :key="alert.id" 
-               class="flex items-start space-x-3 p-3 bg-white/5 rounded-lg">
-            <div class="w-6 h-6 rounded-full flex items-center justify-center mt-1" 
-                 :class="alert.level === 'high' ? 'bg-red-500/20' : alert.level === 'medium' ? 'bg-yellow-500/20' : 'bg-blue-500/20'">
-              <AlertTriangleIcon class="w-4 h-4" 
-                               :class="alert.level === 'high' ? 'text-red-400' : alert.level === 'medium' ? 'text-yellow-400' : 'text-blue-400'" />
+          <div v-for="alert in recentAlerts" :key="alert.id" class="flex items-start space-x-3 p-3 bg-white/5 rounded-lg">
+            <div
+              class="w-6 h-6 rounded-full flex items-center justify-center mt-1"
+              :class="alert.level === 'high' ? 'bg-red-500/20' : alert.level === 'medium' ? 'bg-yellow-500/20' : 'bg-blue-500/20'"
+            >
+              <AlertTriangleIcon
+                class="w-4 h-4"
+                :class="alert.level === 'high' ? 'text-red-400' : alert.level === 'medium' ? 'text-yellow-400' : 'text-blue-400'"
+              />
             </div>
             <div class="flex-1">
               <p class="text-white text-sm">{{ alert.message }}</p>
@@ -293,6 +288,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import { TrendingUpIcon, UsersIcon, AlertTriangleIcon, WifiIcon, CpuIcon, MemoryStickIcon, HardDriveIcon, ServerIcon, MonitorIcon, ActivityIcon, BuildingIcon, ShieldAlertIcon, BrainIcon, RefreshCwIcon, LightbulbIcon } from 'lucide-vue-next'
+import { fetchJSON, apiUrl } from '../lib/http'
+import { useDashboardLayout, type DashboardWidgetId } from '../composables/useDashboardLayout'
 
 // 响应式数据
 const realtimeData = ref({
@@ -373,12 +370,30 @@ const aiInsights = ref({
 
 let trafficChart: echarts.ECharts | null = null
 let websiteChart: echarts.ECharts | null = null
-let updateInterval: NodeJS.Timeout | null = null
+let updateInterval: ReturnType<typeof setInterval> | null = null
 
 const router = useRouter()
+const { activeTemplate } = useDashboardLayout()
 
 const goKanban = () => {
   router.push({ name: 'kanban' })
+}
+
+const goLayout = () => {
+  router.push({ name: 'dashboard-layout' })
+}
+
+const widgetStyle = (id: DashboardWidgetId) => {
+  const l = activeTemplate.value.layout[id]
+  return {
+    gridColumn: `span ${l.colSpan} / span ${l.colSpan}`,
+    gridRow: `span ${l.rowSpan} / span ${l.rowSpan}`,
+    order: String(l.order),
+  }
+}
+
+const isWidgetHidden = (id: DashboardWidgetId) => {
+  return Boolean(activeTemplate.value.layout[id]?.hidden)
 }
 
 /**
@@ -453,13 +468,15 @@ const applySuggestion = (suggestion: any) => {
 /**
  * 获取实时数据
  */
+/**
+ * 获取实时数据
+ * @function fetchRealtimeData
+ */
 const fetchRealtimeData = async () => {
   try {
-    const response = await fetch('/api/network/realtime')
-    const result = await response.json()
-    if (result.success) {
-      realtimeData.value = result.data
-    }
+    type ApiResp<T> = { success: boolean; data: T }
+    const result = await fetchJSON<ApiResp<any>>(apiUrl('/api/network/realtime'))
+    if (result?.success) realtimeData.value = result.data
   } catch (error) {
     console.error('获取实时数据失败:', error)
   }
@@ -468,13 +485,15 @@ const fetchRealtimeData = async () => {
 /**
  * 获取部门统计
  */
+/**
+ * 获取部门统计
+ * @function fetchDepartmentStats
+ */
 const fetchDepartmentStats = async () => {
   try {
-    const response = await fetch('/api/employees/stats/departments')
-    const result = await response.json()
-    if (result.success) {
-      departmentStats.value = result.data
-    }
+    type ApiResp<T> = { success: boolean; data: T }
+    const result = await fetchJSON<ApiResp<any>>(apiUrl('/api/employees/stats/departments'))
+    if (result?.success) departmentStats.value = result.data
   } catch (error) {
     console.error('获取部门统计失败:', error)
   }
@@ -483,14 +502,18 @@ const fetchDepartmentStats = async () => {
 /**
  * 初始化流量趋势图表
  */
+/**
+ * 初始化流量趋势图表
+ * @function initTrafficChart
+ */
 const initTrafficChart = async () => {
   if (!trafficChartRef.value) return
 
   try {
-    const response = await fetch('/api/network/traffic?hours=24')
-    const result = await response.json()
+    type ApiResp<T> = { success: boolean; data: T }
+    const result = await fetchJSON<ApiResp<any[]>>(apiUrl('/api/network/traffic?hours=24'))
     
-    if (result.success) {
+    if (result?.success) {
       trafficChart = echarts.init(trafficChartRef.value)
       
       const option = {
@@ -509,7 +532,7 @@ const initTrafficChart = async () => {
         },
         xAxis: {
           type: 'category',
-          data: result.data.map((item: any) => new Date(item.timestamp).getHours() + ':00'),
+          data: (result.data || []).map((item: any) => new Date(item.timestamp).getHours() + ':00'),
           axisLine: { lineStyle: { color: '#4a90e2' } },
           axisLabel: { color: '#a0c4ff' }
         },
@@ -526,7 +549,7 @@ const initTrafficChart = async () => {
             name: '总流量',
             type: 'line',
             smooth: true,
-            data: result.data.map((item: any) => item.totalTraffic),
+            data: (result.data || []).map((item: any) => item.totalTraffic),
             lineStyle: { color: '#1890ff', width: 3 },
             areaStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -539,14 +562,14 @@ const initTrafficChart = async () => {
             name: '上传流量',
             type: 'line',
             smooth: true,
-            data: result.data.map((item: any) => item.uploadTraffic),
+            data: (result.data || []).map((item: any) => item.uploadTraffic),
             lineStyle: { color: '#52c41a', width: 2 }
           },
           {
             name: '下载流量',
             type: 'line',
             smooth: true,
-            data: result.data.map((item: any) => item.downloadTraffic),
+            data: (result.data || []).map((item: any) => item.downloadTraffic),
             lineStyle: { color: '#faad14', width: 2 }
           }
         ],
@@ -566,14 +589,18 @@ const initTrafficChart = async () => {
 /**
  * 初始化网站访问图表
  */
+/**
+ * 初始化网站访问图表
+ * @function initWebsiteChart
+ */
 const initWebsiteChart = async () => {
   if (!websiteChartRef.value) return
 
   try {
-    const response = await fetch('/api/network/websites')
-    const result = await response.json()
+    type ApiResp<T> = { success: boolean; data: T }
+    const result = await fetchJSON<ApiResp<any[]>>(apiUrl('/api/network/websites'))
     
-    if (result.success) {
+    if (result?.success) {
       websiteChart = echarts.init(websiteChartRef.value)
       
       const option = {
@@ -595,7 +622,7 @@ const initWebsiteChart = async () => {
             type: 'pie',
             radius: ['40%', '70%'],
             center: ['60%', '50%'],
-            data: result.data.map((item: any) => ({
+            data: (result.data || []).map((item: any) => ({
               value: item.visits,
               name: item.website,
               itemStyle: {

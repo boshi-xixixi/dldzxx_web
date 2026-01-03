@@ -15,3 +15,58 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html[theme-mode='dark'],
+html[theme-mode='dark'] body {
+  color: #e5e7eb;
+}
+
+html[theme-mode='dark'] .t-form__label,
+html[theme-mode='dark'] .t-dialog__title,
+html[theme-mode='dark'] .t-dialog__header,
+html[theme-mode='dark'] .t-dialog__body,
+html[theme-mode='dark'] .t-pagination,
+html[theme-mode='dark'] .t-table th,
+html[theme-mode='dark'] .t-table td,
+html[theme-mode='dark'] .t-table__content,
+html[theme-mode='dark'] .t-table__footer,
+html[theme-mode='dark'] .t-input__inner,
+html[theme-mode='dark'] .t-textarea__inner,
+html[theme-mode='dark'] .t-select__single,
+html[theme-mode='dark'] .t-select__value,
+html[theme-mode='dark'] .t-select__input {
+  color: #e5e7eb;
+}
+
+html[theme-mode='dark'] .t-input__inner::placeholder,
+html[theme-mode='dark'] .t-textarea__inner::placeholder,
+html[theme-mode='dark'] .t-select__placeholder {
+  color: #9ca3af;
+}
+
+html[theme-mode='dark'] .t-input__inner,
+html[theme-mode='dark'] .t-textarea__inner,
+html[theme-mode='dark'] .t-select__single {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+html[theme-mode='dark'] .t-input__inner:hover,
+html[theme-mode='dark'] .t-textarea__inner:hover,
+html[theme-mode='dark'] .t-select__single:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* Custom Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.mask-gradient {
+  mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent);
+}

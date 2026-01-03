@@ -286,6 +286,7 @@ import {
   LightbulbIcon,
   FileTextIcon
 } from 'lucide-vue-next'
+import { safeJson } from '../lib/http'
 
 const router = useRouter()
 const { generateReport } = useReportState()
@@ -335,8 +336,8 @@ const fetchAnalysisStats = async () => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const result = await response.json()
-    if (result.success) {
+    const result = await safeJson(response)
+    if (result && result.success) {
       analysisStats.value = result.data
     }
   } catch (error) {
@@ -361,8 +362,8 @@ const fetchBehaviorPatterns = async () => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const result = await response.json()
-    if (result.success) {
+    const result = await safeJson(response)
+    if (result && result.success) {
       behaviorPatterns.value = result.data.patterns
       riskMetrics.value = result.data.riskMetrics
     }
@@ -370,10 +371,10 @@ const fetchBehaviorPatterns = async () => {
     console.error('获取行为模式失败:', error)
     // 使用模拟数据
     behaviorPatterns.value = [
-      '大量文件下载',
-      '非工作时间访问',
-      '异常网络流量',
-      '敏感数据访问'
+      { id: 1, description: '大量文件下载', severity: 'high', affectedEmployees: 12, confidence: 86 },
+      { id: 2, description: '非工作时间访问', severity: 'medium', affectedEmployees: 19, confidence: 78 },
+      { id: 3, description: '异常网络流量', severity: 'high', affectedEmployees: 7, confidence: 81 },
+      { id: 4, description: '敏感数据访问', severity: 'medium', affectedEmployees: 15, confidence: 74 }
     ]
     riskMetrics.value = {
       dataLeakage: 15,
@@ -392,8 +393,8 @@ const fetchHighRiskEmployees = async () => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const result = await response.json()
-    if (result.success) {
+    const result = await safeJson(response)
+    if (result && result.success) {
       highRiskEmployees.value = result.data
     }
   } catch (error) {
@@ -448,8 +449,8 @@ const fetchSecuritySuggestions = async () => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const result = await response.json()
-    if (result.success) {
+    const result = await safeJson(response)
+    if (result && result.success) {
       securitySuggestions.value = result.data
     }
   } catch (error) {
@@ -760,3 +761,4 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.5);
 }
 </style>
+import { safeJson } from '../lib/http'

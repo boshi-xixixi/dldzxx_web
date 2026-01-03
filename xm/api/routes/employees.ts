@@ -1,17 +1,17 @@
 /**
  * 员工监控相关API路由
  */
-import { Router } from 'express';
+import { Router, type Router as ExpressRouter } from 'express';
 import { 
   generateEmployees, 
   generateNetworkTraffic,
   generateWebsiteVisits 
 } from '../data/mockData.js';
 
-const router = Router();
+const router: ExpressRouter = Router();
 
 // 缓存员工数据，避免每次请求都重新生成
-let cachedEmployees = generateEmployees(20);
+const cachedEmployees = generateEmployees(20);
 
 /**
  * 获取员工列表

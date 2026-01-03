@@ -566,6 +566,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import * as echarts from 'echarts'
 import { UsersIcon, WifiIcon, AlertTriangleIcon, TrendingUpIcon, RefreshCwIcon, BrainIcon, LightbulbIcon, ShieldIcon } from 'lucide-vue-next'
+import { safeJson } from '../lib/http'
 
 // 响应式数据
 const loading = ref(false)
@@ -771,11 +772,11 @@ const fetchEmployees = async () => {
     }
 
     const response = await fetch(`/api/employees?${params}`)
-    const result = await response.json()
+    const result = await safeJson(response)
     
-    if (result.success) {
-      employees.value = result.data.employees
-      pagination.value.total = result.data.total
+    if (result && result.success) {
+      employees.value = result.data?.employees || []
+      pagination.value.total = result.data?.total || 0
     }
   } catch (error) {
     console.error('获取员工数据失败:', error)

@@ -337,3 +337,205 @@ export function generateAIUsageReport() {
     }
   };
 }
+
+export type SecuritySeverity = 'info' | 'low' | 'medium' | 'high' | 'critical'
+export type SecurityEventStatus = 'open' | 'investigating' | 'mitigated' | 'resolved'
+
+export type SecurityTelemetrySample = {
+  timestamp: string
+  deviceId: string
+  service: string
+  trafficMbps: number
+  rps: number
+  errorRate: number
+  latencyMs: number
+  httpSamples: Array<{
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+    path: string
+    status: number
+    userAgent: string
+    bodySnippet?: string
+  }>
+}
+
+export type SecurityEvent = {
+  id: string
+  timestamp: string
+  title: string
+  type: 'traffic_spike' | 'dynamic_threshold' | 'script_injection' | 'anomaly' | 'vulnerability' | 'compliance'
+  severity: SecuritySeverity
+  status: SecurityEventStatus
+  source: {
+    deviceId?: string
+    service?: string
+    ip?: string
+  }
+  indicators: string[]
+  description: string
+  recoveryProgress: number
+  timeline: Array<{
+    at: string
+    phase: string
+    message: string
+  }>
+}
+
+/**
+ * 生成安全遥测数据样本（用于实时数据流模拟）
+ */
+export function generateSecurityTelemetrySample(): SecurityTelemetrySample {
+  const deviceIds = ['fw-01', 'waf-01', 'lb-01', 'core-sw-01', 'dns-01']
+  const services = ['waf', 'gateway', 'portal', 'dns', 'vpn']
+  const paths = ['/login', '/api/search', '/api/upload', '/admin', '/assets/app.js']
+  const userAgents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+    'curl/8.5.0',
+    'python-requests/2.31.0',
+    'Go-http-client/1.1',
+  ]
+  const methods: Array<'GET' | 'POST' | 'PUT' | 'DELETE'> = ['GET', 'POST', 'PUT', 'DELETE']
+
+  const trafficBase = 120 + Math.random() * 120
+  const spike = Math.random() < 0.08 ? 400 + Math.random() * 800 : 0
+  const trafficMbps = Math.round(trafficBase + spike)
+  const rpsBase = 60 + Math.random() * 120
+  const rpsSpike = Math.random() < 0.08 ? 500 + Math.random() * 1500 : 0
+  const rps = Math.round(rpsBase + rpsSpike)
+  const errorRate = Math.min(0.25, Math.max(0, (Math.random() - 0.7) * 0.08 + (spike > 0 ? 0.08 : 0)))
+  const latencyMs = Math.round(20 + Math.random() * 80 + (spike > 0 ? 120 + Math.random() * 300 : 0))
+
+  const httpSamples = Array.from({ length: 8 }, () => {
+    const method = methods[Math.floor(Math.random() * methods.length)]
+    const path = paths[Math.floor(Math.random() * paths.length)]
+    const statusRoll = Math.random()
+    const status = statusRoll < 0.08 ? 500 : statusRoll < 0.15 ? 403 : 200
+    const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)]
+
+    const injectionRoll = Math.random()
+    const bodySnippet =
+      method === 'POST' && injectionRoll < 0.06
+        ? '<script>alert(1)</script>'
+        : method === 'POST' && injectionRoll < 0.09
+          ? '"; DROP TABLE users; --'
+          : undefined
+
+    return { method, path, status, userAgent, bodySnippet }
+  })
+
+  return {
+    timestamp: new Date().toISOString(),
+    deviceId: deviceIds[Math.floor(Math.random() * deviceIds.length)],
+    service: services[Math.floor(Math.random() * services.length)],
+    trafficMbps,
+    rps,
+    errorRate: Number(errorRate.toFixed(4)),
+    latencyMs,
+    httpSamples,
+  }
+}
+
+export type VulnerabilityFinding = {
+  id: string
+  cve?: string
+  title: string
+  severity: SecuritySeverity
+  affectedAsset: string
+  evidence: string
+  recommendation: string
+  detectedAt: string
+}
+
+/**
+ * 生成联网漏洞扫描结果（Mock）
+ */
+export function generateVulnerabilityFindings(): VulnerabilityFinding[] {
+  const findings: Array<Omit<VulnerabilityFinding, 'id' | 'detectedAt'>> = [
+    {
+      cve: 'CVE-2024-6387',
+      title: 'OpenSSH regreSSHion 可能导致远程代码执行',
+      severity: 'critical',
+      affectedAsset: 'vpn-01',
+      evidence: 'OpenSSH 版本疑似受影响，建议立即核验版本与补丁',
+      recommendation: '升级 OpenSSH 至官方修复版本，并启用最小权限策略',
+    },
+    {
+      cve: 'CVE-2023-44487',
+      title: 'HTTP/2 Rapid Reset 拒绝服务风险',
+      severity: 'high',
+      affectedAsset: 'gateway',
+      evidence: '检测到 HTTP/2 请求异常峰值与 reset 模式',
+      recommendation: '开启 WAF/网关的 HTTP/2 限流与连接保护，更新反向代理版本',
+    },
+    {
+      title: '弱口令风险（暴露服务）',
+      severity: 'medium',
+      affectedAsset: 'core-sw-01',
+      evidence: '存在多次登录失败与常见密码字典特征',
+      recommendation: '启用 MFA、提高口令复杂度与锁定策略，限制管理面访问源',
+    },
+    {
+      title: '过期 TLS 配置',
+      severity: 'low',
+      affectedAsset: 'portal',
+      evidence: '仍支持 TLS 1.0/1.1 或弱加密套件',
+      recommendation: '禁用 TLS 1.0/1.1，启用现代套件与 HSTS',
+    },
+  ]
+
+  return findings
+    .filter(() => Math.random() > 0.15)
+    .map((f, idx) => ({
+      id: `vuln_${Date.now()}_${idx}`,
+      detectedAt: new Date().toISOString(),
+      ...f,
+    }))
+}
+
+export type ComplianceControl = {
+  id: string
+  name: string
+  requirement: string
+  status: 'pass' | 'partial' | 'fail'
+  evidence: string[]
+  remediation: string[]
+}
+
+/**
+ * 生成等保2.0三级合规评估（Mock）
+ */
+export function generateComplianceAssessment(): ComplianceControl[] {
+  return [
+    {
+      id: 'MLPS3-AC-01',
+      name: '身份鉴别与访问控制',
+      requirement: '关键系统启用强身份鉴别与最小权限',
+      status: Math.random() > 0.2 ? 'partial' : 'fail',
+      evidence: ['部分系统未启用 MFA', '权限矩阵缺少定期复核记录'],
+      remediation: ['统一接入 IAM/SSO', '开启 MFA', '建立权限定期复核流程'],
+    },
+    {
+      id: 'MLPS3-AU-01',
+      name: '安全审计',
+      requirement: '关键操作留痕、集中审计与可追溯',
+      status: Math.random() > 0.2 ? 'pass' : 'partial',
+      evidence: ['网关与 WAF 日志已集中', '部分终端日志采集缺口'],
+      remediation: ['补齐终端 EDR 日志采集', '审计留存周期达标'],
+    },
+    {
+      id: 'MLPS3-IR-01',
+      name: '安全事件处置',
+      requirement: '建立监测、预警、处置、复盘闭环',
+      status: 'partial',
+      evidence: ['已具备告警与事件记录', '缺少标准化处置剧本与知识库沉淀'],
+      remediation: ['建立事件分级与响应SOP', '复盘结论沉淀到知识库'],
+    },
+    {
+      id: 'MLPS3-NP-01',
+      name: '网络与边界防护',
+      requirement: '边界防护、入侵防范与流量治理',
+      status: Math.random() > 0.15 ? 'partial' : 'fail',
+      evidence: ['存在异常流量峰值', '部分服务缺少限流策略'],
+      remediation: ['启用动态阈值限流', '完善WAF规则与黑白名单'],
+    },
+  ]
+}

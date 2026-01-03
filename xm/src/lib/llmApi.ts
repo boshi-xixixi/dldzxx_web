@@ -18,7 +18,36 @@ type SendMessageResponse = {
   assistant_response: string
 }
 
-const BASE_URL = import.meta.env.VITE_LLM_API_BASE_URL || 'http://localhost:8000'
+const BASE_URL = '' // Use relative path to allow proxying
+
+/**
+ * Report Types and Interfaces
+ */
+export enum ReportType {
+  EMPLOYEE_BEHAVIOR = 'employee_behavior',
+  COMPANY_BEHAVIOR = 'company_behavior',
+  AI_USAGE = 'ai_usage'
+}
+
+export enum ReportStatus {
+  PENDING = 'pending',
+  GENERATING = 'generating',
+  COMPLETED = 'completed',
+  FAILED = 'failed'
+}
+
+export interface Report {
+  id: string
+  type: ReportType | string
+  title: string
+  description: string
+  status: ReportStatus | string
+  createdAt: string
+  completedAt?: string
+  parameters: Record<string, any>
+  data?: any
+  employeeName?: string // Optional helper field for UI
+}
 
 /**
  * 执行带有 JSON 请求体的 POST 请求
@@ -170,5 +199,34 @@ export async function loginOrRegisterAndGetToken(username: string, email: string
     await register(username, email, password)
     const t = await login(username, password)
     return t.access_token
+  }
+}
+
+/**
+ * 获取报告列表
+ */
+export async function getReports(filters: any = {}): Promise<Report[]> {
+  const query = new URLSearchParams(filters).toString()
+  const url = `${BASE_URL}/api/reports?${query}`
+  const res = await fetch(url)
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`GET ${url} failed: ${res.status} ${text}`)
+  }
+  const json = await res.json()
+  return json.data.reports || []
+}
+
+/**
+ * 删除报告
+ */
+export async function deleteReport(id: string): Promise<void> {
+  const url = `${BASE_URL}/api/reports/${id}`
+  const res = await fetch(url, {
+    method: 'DELETE'
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`DELETE ${url} failed: ${res.status} ${text}`)
   }
 }

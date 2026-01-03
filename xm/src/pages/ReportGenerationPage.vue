@@ -226,12 +226,19 @@ const recentReportsColumns = [
   { colKey: 'actions', title: '操作', width: '150px' }
 ];
 
+const normalizeReportType = (type: string) => {
+  if (type === 'employee_behavior') return 'employee'
+  if (type === 'company_behavior') return 'company'
+  return type
+}
+
 // 获取员工列表
 const fetchEmployees = async () => {
   try {
     const response = await fetch('/api/employees');
     const data = await response.json();
-    employees.value = data.data || [];
+    const list = data?.data?.employees ?? data?.data ?? [];
+    employees.value = Array.isArray(list) ? list : [];
   } catch (error) {
     console.error('获取员工列表失败:', error);
   }
@@ -241,9 +248,12 @@ const fetchEmployees = async () => {
 const fetchRecentReports = async () => {
   loadingReports.value = true;
   try {
-    const response = await fetch('/api/reports?limit=5');
+    const response = await fetch('/api/reports?page=1&limit=5');
     const data = await response.json();
-    recentReports.value = data.data || [];
+    const list = data?.data?.reports ?? data?.data ?? [];
+    recentReports.value = Array.isArray(list)
+      ? list.map((r: any) => ({ ...r, type: normalizeReportType(r?.type) }))
+      : [];
   } catch (error) {
     console.error('获取报告列表失败:', error);
   } finally {
@@ -275,17 +285,27 @@ const handleSubmit = async ({ validateResult }: any) => {
     generating.value = true;
     
     try {
+      const apiType =
+        formData.type === 'employee'
+          ? 'employee_behavior'
+          : formData.type === 'company'
+            ? 'company_behavior'
+            : formData.type
+
       const response = await fetch('/api/reports', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          type: formData.type,
+          type: apiType,
+          parameters: {
+            employeeName: formData.employeeName,
+            startDate: formData.dateRange?.[0],
+            endDate: formData.dateRange?.[1],
+          },
           title: formData.title,
           description: formData.description,
-          employeeName: formData.employeeName,
-          dateRange: formData.dateRange
         })
       });
       
@@ -387,6 +407,7 @@ onMounted(() => {
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
+  color: #e5e7eb;
 }
 
 .page-header {
@@ -396,12 +417,12 @@ onMounted(() => {
 .page-header h1 {
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ffffff;
   margin: 0 0 8px 0;
 }
 
 .page-description {
-  color: #6b7280;
+  color: #9ca3af;
   margin: 0;
 }
 
@@ -424,9 +445,9 @@ onMounted(() => {
   align-items: flex-start;
   gap: 16px;
   padding: 20px;
-  background: #f9fafb;
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .info-icon {
@@ -455,12 +476,12 @@ onMounted(() => {
 .info-content h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ffffff;
   margin: 0 0 8px 0;
 }
 
 .info-content p {
-  color: #6b7280;
+  color: #cbd5e1;
   margin: 0;
   line-height: 1.5;
 }

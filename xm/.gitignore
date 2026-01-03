@@ -11,6 +11,12 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+!.env.template
+coverage
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
@@ -23,3 +29,18 @@ dist-ssr
 *.sln
 *.sw?
 .vite
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+LLM-filter-main/.venv/
+
+# Lockfiles
+package-lock.json

@@ -54,7 +54,6 @@ const initCesium = () => {
     timeline: false,
     navigationHelpButton: false,
     scene3DOnly: true,
-    imageryProvider: undefined,
     requestRenderMode: true,
     maximumRenderTimeChange: Infinity,
   });
@@ -113,9 +112,9 @@ const loadWorldPolygons = async () => {
     const outline = Cesium.Color.fromCssColorString('#7288a2').withAlpha(0.6);
     ds.entities.values.forEach((entity) => {
       if (entity.polygon) {
-        entity.polygon.material = fill;
-        entity.polygon.outline = true;
-        entity.polygon.outlineColor = outline;
+        entity.polygon.material = new Cesium.ColorMaterialProperty(fill);
+        entity.polygon.outline = new Cesium.ConstantProperty(true);
+        entity.polygon.outlineColor = new Cesium.ConstantProperty(outline);
       }
     });
   } catch (e) {
@@ -159,7 +158,7 @@ const addContinentLabels = () => {
     { name: '南极洲', lng: 0, lat: -80 }
   ];
   data.forEach(d => {
-    viewer.value!.entities.add({
+    viewer.value?.entities.add({
       position: Cesium.Cartesian3.fromDegrees(d.lng, d.lat),
       label: {
         text: d.name,
@@ -184,17 +183,18 @@ const addContinentLabels = () => {
 let continentCenters: Record<string, { lng: number; lat: number }> = {};
 
 const removeContinentLabels = () => {
-  if (!viewer.value) return;
+  const v = viewer.value;
+  if (!v) return;
   const names = new Set(['亚洲','欧洲','非洲','北美洲','南美洲','大洋洲','南极洲']);
   const now = Cesium.JulianDate.now();
-  viewer.value.entities.values.slice().forEach((e) => {
+  v.entities.values.slice().forEach((e) => {
     const lbl: any = (e as any).label;
     let txt: any = undefined;
     if (lbl && lbl.text) {
       txt = typeof lbl.text === 'string' ? lbl.text : (lbl.text.getValue ? lbl.text.getValue(now) : undefined);
     }
     if (txt && names.has(txt)) {
-      viewer.value!.entities.remove(e);
+      v.entities.remove(e);
     }
   });
 };
@@ -360,7 +360,9 @@ const createBeam = (threat: Threat, lineEntity: Cesium.Entity, color: Cesium.Col
     if (t > 1) return;
     const pos = Cesium.Cartesian3.lerp(startPos, endPos, t, new Cesium.Cartesian3());
     const alpha = 0.5 * (1 - t);
-    const p = viewer.value!.entities.add({
+    const v = viewer.value;
+    if (!v) return;
+    const p = v.entities.add({
       position: pos,
       point: { pixelSize: 3, color: color.withAlpha(alpha) }
     });
@@ -368,13 +370,14 @@ const createBeam = (threat: Threat, lineEntity: Cesium.Entity, color: Cesium.Col
   }, (duration * 1000) / 12);
 
   setTimeout(() => {
-    if (!viewer.value) return;
-    viewer.value.entities.remove(beam);
+    const v = viewer.value;
+    if (!v) return;
+    v.entities.remove(beam);
     beamEntities.delete(threat.id);
-    viewer.value.entities.remove(lineEntity);
+    v.entities.remove(lineEntity);
     lineEntities.delete(threat.id);
     clearInterval(trailTimer);
-    trailPoints.forEach(p => viewer.value!.entities.remove(p));
+    trailPoints.forEach(p => v.entities.remove(p));
   }, duration * 1000 + 300);
 };
 
@@ -397,14 +400,6 @@ watch(control, (c, prev) => {
   }
 }, { deep: true });
 
-</script>
-
-<style scoped>
-/* Override cesium default widgets style if needed */
-:deep(.cesium-viewer-bottom) {
-  display: none;
-}
-</style>
 /**
  * 监听光束重放信号
  */
@@ -412,7 +407,6 @@ watch(replayBeamSignal, (sig, prev) => {
   if (!viewer.value) return;
   if (sig.tick !== prev.tick && sig.id) {
     const lineEntity = lineEntities.get(sig.id);
-    // 查找威胁数据以获取颜色与坐标
     const t = filteredThreats.value.find(x => x.id === sig.id);
     if (lineEntity && t && t.targetLng && t.targetLat) {
       const color = t.severity === 'high' ? Cesium.Color.RED : t.severity === 'medium' ? Cesium.Color.ORANGE : Cesium.Color.YELLOW;
@@ -436,3 +430,12 @@ watch(focusContinentSignal, (sig, prev) => {
     }
   }
 }, { deep: true });
+
+</script>
+
+<style scoped>
+/* Override cesium default widgets style if needed */
+:deep(.cesium-viewer-bottom) {
+  display: none;
+}
+</style>

@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import { generateEmployeeReport, generateCompanyReport, generateAIUsageReport } from '../data/mockData';
+import { Router, type Router as ExpressRouter } from 'express';
+import { generateEmployeeReport, generateCompanyReport, generateAIUsageReport } from '../data/mockData.js';
 
-const router = Router();
+const router: ExpressRouter = Router();
 
 // 报告类型枚举
 export enum ReportType {
@@ -38,7 +38,7 @@ export interface Report {
 }
 
 // 模拟报告存储
-let reports: Report[] = [
+const reports: Report[] = [
   {
     id: 'rpt_001',
     type: ReportType.EMPLOYEE_BEHAVIOR,

@@ -78,9 +78,6 @@ const initOpenLayers = () => {
     overlay.value = new Overlay({
       element: popupRef.value,
       autoPan: true,
-      autoPanAnimation: {
-        duration: 250,
-      },
     });
   }
 
@@ -103,9 +100,11 @@ const initOpenLayers = () => {
       minZoom: 2,
       maxZoom: 10
     }),
-    overlays: overlay.value ? [overlay.value] : [],
     controls: [] 
   });
+  if (overlay.value) {
+    overlay.value.setMap(map.value as any);
+  }
   setTimeout(() => map.value && map.value.updateSize(), 0);
 
   // Click interaction
@@ -128,6 +127,7 @@ const initOpenLayers = () => {
         }
         popupRef.value.style.display = 'block';
         overlay.value.setPosition(evt.coordinate);
+        overlay.value.panIntoView({ animation: { duration: 250 } });
       }
     } else {
       if (popupRef.value && overlay.value) {

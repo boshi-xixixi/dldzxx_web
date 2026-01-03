@@ -1,17 +1,17 @@
 /**
  * AI分析相关API路由
  */
-import { Router } from 'express';
+import { Router, type Router as ExpressRouter } from 'express';
 import { 
   generateAIAnalysis, 
   generateAIChatResponse,
   generateEmployees 
 } from '../data/mockData.js';
 
-const router = Router();
+const router: ExpressRouter = Router();
 
 // 缓存员工数据
-let cachedEmployees = generateEmployees(20);
+const cachedEmployees = generateEmployees(20);
 
 /**
  * AI行为分析

@@ -1,5 +1,5 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "extends": "./node_modules/@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
@@ -15,13 +15,11 @@
     },
     "resolveJsonModule": true,
     "types": [
-      "node",
-      "express"
+      "node"
     ]
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.vue",
-    "api"
+    "src/**/*.vue"
   ]
 }

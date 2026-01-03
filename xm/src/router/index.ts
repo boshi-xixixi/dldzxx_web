@@ -11,6 +11,8 @@ import CompanyReportDetailPage from '../pages/CompanyReportDetailPage.vue'
 import AIUsageReportDetailPage from '../pages/AIUsageReportDetailPage.vue'
 import { useReportState } from '../composables/useReportState'
 import KanbanPage from '../pages/KanbanPage.vue'
+import SecurityOpsPage from '../pages/SecurityOpsPage.vue'
+import DashboardLayoutPage from '../pages/DashboardLayoutPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +32,15 @@ const router = createRouter({
       component: KanbanPage,
       meta: {
         title: '看板显示',
+        icon: 'monitor'
+      }
+    },
+    {
+      path: '/dashboard-layout',
+      name: 'dashboard-layout',
+      component: DashboardLayoutPage,
+      meta: {
+        title: '布局模板',
         icon: 'monitor'
       }
     },
@@ -59,6 +70,33 @@ const router = createRouter({
         title: 'AI助手',
         icon: 'message-circle'
       }
+    },
+    {
+      path: '/security-ops',
+      name: 'security-ops',
+      component: SecurityOpsPage,
+      meta: {
+        title: '安全运营',
+        icon: 'shield',
+      },
+    },
+    {
+      path: '/reports',
+      name: 'reports',
+      component: ReportListPage,
+      meta: {
+        title: '报告列表',
+        icon: 'file-text',
+      },
+    },
+    {
+      path: '/reports/generate',
+      name: 'reports-generate',
+      component: ReportGenerationPage,
+      meta: {
+        title: '生成报告',
+        icon: 'file-plus',
+      },
     },
     {
       path: '/report',

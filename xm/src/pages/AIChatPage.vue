@@ -107,15 +107,18 @@
           </div>
 
           <!-- 消息滚动区 -->
-          <div class="flex-1 overflow-y-auto p-6 chat-scroll-area">
-            <t-chat
-              ref="chatRef"
-              :data="chatMessages"
-              :reverse="false"
-              :clear-history="false"
-              @scroll="handleScrollToBottom"
-              class="min-h-[420px]"
-            />
+          <div class="flex-1 overflow-y-auto p-6 chat-scroll-area" ref="chatRef">
+            <div class="min-h-[420px] space-y-4">
+              <div v-for="m in messages" :key="m.id">
+                <div class="t-chat__base">
+                  <span class="t-chat__name">{{ m.role === 'user' ? '用户' : 'AI助手' }}</span>
+                  <span class="t-chat__time">{{ m.time }}</span>
+                </div>
+                <div :class="m.role === 'assistant' ? 't-chat__inner assistant t-chat__text__assistant t-chat__message-text' : 't-chat__inner user t-chat__text__user t-chat__message-text'">
+                  <pre>{{ m.content }}</pre>
+                </div>
+              </div>
+            </div>
           </div>
           <!-- 底部输入栏（吸底） -->
           <div class="p-4 border-t border-white/15 bg-white/5 backdrop-blur-sm">
@@ -320,15 +323,7 @@ const averageResponseTime = computed(() => {
  * 将内部 messages 映射为 TDesign Chat 组件所需的数据结构
  * 字段映射：content -> content，role -> role，time -> datetime，并补充显示名称与头像
  */
-const chatMessages = computed(() => {
-  return messages.value.map((m: any) => ({
-    content: m.content,
-    role: m.role,
-    datetime: m.time,
-    name: m.role === 'user' ? '用户' : 'AI助手',
-    avatar: m.role === 'user' ? chatConfig.userAvatar : chatConfig.assistantAvatar,
-  }))
-})
+const chatMessages = computed(() => messages.value)
 
 /**
  * 获取助手状态数据
@@ -348,7 +343,7 @@ const fetchAssistantStatus = async () => {
   }
   // 回退到本地模拟接口
   try {
-    const response = await fetch(`${apiBase}/api/ai/analytics-stats`)
+    const response = await fetch('/api/ai/analytics-stats')
     const result = await response.json()
     if (result.success) {
       assistantStatus.value = {
@@ -389,7 +384,7 @@ const handleSubmit = async (message: any) => {
   })
   // 滚动到底部以显示最新的用户消息
   await nextTick()
-  chatRef.value?.scrollToBottom({ behavior: 'auto' })
+  chatRef.value && (chatRef.value.scrollTop = chatRef.value.scrollHeight)
 
   // 分析问题类型
   analyzeQuestionType(message.text)
@@ -406,7 +401,7 @@ const handleSubmit = async (message: any) => {
       })
       // 滚动到底部以显示最新的助手消息
       await nextTick()
-      chatRef.value?.scrollToBottom({ behavior: 'auto' })
+      chatRef.value && (chatRef.value.scrollTop = chatRef.value.scrollHeight)
       return
     }
   } catch (error) {
@@ -415,27 +410,12 @@ const handleSubmit = async (message: any) => {
 
   // 回退到本地模拟接口
   try {
-    const response = await fetch(`${apiBase}/api/ai/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: message.text,
-        history: messages.value.slice(-10)
-      })
-    })
+    const response = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: message.text, history: messages.value.slice(-10) }) })
     const result = await response.json()
-    if (result.success) {
-      messages.value.push({
-        id: Date.now() + 1,
-        content: result.data.reply,
-        role: 'assistant',
-        time: new Date().toLocaleTimeString('zh-CN')
-      })
-      // 滚动到底部以显示最新的助手消息
+    if (result?.success) {
+      messages.value.push({ id: Date.now() + 1, content: result.data.reply, role: 'assistant', time: new Date().toLocaleTimeString('zh-CN') })
       await nextTick()
-      chatRef.value?.scrollToBottom({ behavior: 'auto' })
+      chatRef.value && (chatRef.value.scrollTop = chatRef.value.scrollHeight)
     }
   } catch (error) {
     console.error('本地模拟发送失败:', error)
@@ -447,7 +427,7 @@ const handleSubmit = async (message: any) => {
     })
     // 滚动到底部以显示错误提示消息
     await nextTick()
-    chatRef.value?.scrollToBottom({ behavior: 'auto' })
+    chatRef.value && (chatRef.value.scrollTop = chatRef.value.scrollHeight)
   }
 }
 
@@ -533,7 +513,7 @@ const submitFeedback = async () => {
   }
 
   try {
-    const response = await fetch(`${apiBase}/api/ai/feedback`, {
+    const response = await fetch('/api/ai/feedback', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
